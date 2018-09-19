@@ -7,12 +7,13 @@ const querystring = require('querystring');
 const iconv = require('iconv-lite');
 const cheerio = require('cheerio');
 
-const { username, password } = require('./secret.json');
+const config = require('./config.json');
 
-const SEMESTER = '2018-2019-1';
-const TARGET_KCH = '60240103';
-const TARGET_KXH = '0';
-const DELAY_MS = 2000;
+const {
+  username, password,
+  SEMESTER, TARGET_KCH, DELAY_MS,
+} = config;
+const TARGET_KXH = config.TARGET_KXH || '0'; // default as 0
 
 const info = (i) => console.info(i);
 
