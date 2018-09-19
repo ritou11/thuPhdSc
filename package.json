@@ -1,0 +1,32 @@
+{
+  "name": "@ritou11/thuPhdSc",
+  "version": "0.0.1",
+  "description": "Select courses for PhD students in Tsinghua University",
+  "bin": "./bin/thuPhdSc.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "nogeek",
+  "maintainers": [
+    {
+      "name": "Haotian Liu",
+      "email": "ritou11@gmail.com"
+    }
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.12.0"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "axios-cookiejar-support": "^0.4.2",
+    "fs": "^0.0.1-security",
+    "lodash": "^4.17.10",
+    "readline-sync": "^1.4.9",
+    "tough-cookie": "^2.4.3",
+    "yargs": "^12.0.1"
+  }
+}
