@@ -1,5 +1,8 @@
-config.json
+secret.json
 yarn-error.log
 node_modules/
 *.swp
 ~*
+*.jpg
+*.png
+*.html

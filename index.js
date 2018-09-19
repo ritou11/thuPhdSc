@@ -5,17 +5,40 @@ const path = require('path');
 const readlineSync = require('readline-sync');
 const axiosCookieJarSupport = require('axios-cookiejar-support').default;
 const { CookieJar } = require('tough-cookie');
+const querystring = require('querystring');
+const iconv = require('iconv-lite');
+const cheerio = require('cheerio');
+
+const { username, password } = require('./secret.json');
 
 const info = (i) => console.info(i);
 
 const jar = new CookieJar();
 const ax = axios.create({
-  baseURL: 'http://zhjwxk.cic.tsinghua.edu.cn/',
-  timeout: 1000,
+  baseURL: 'https://zhjwxk.cic.tsinghua.edu.cn/',
   withCredentials: true,
   jar,
+  headers: {
+    'Cache-Control': 'no-cache',
+    Connection: 'keep-alive',
+  },
 });
 axiosCookieJarSupport(ax);
+
+const parseXwk = (xwkData) => {
+  const $ = cheerio.load(xwkData);
+  const xwkTotal = $('.trr2').length;
+  const dict = ['课程号', '课序号', '课程名', '课余量', '上课时间', '课容量', '学分', '任课教师', '说明'];
+  const res = [];
+  for (let i = 1; i <= xwkTotal; i += 1) {
+    const trRes = {};
+    $(`#tr_${i}`).children().each((j, el) => {
+      if (j !== 0) trRes[dict[j - 1]] = $(el).text().trim();
+    });
+    res.push(trRes);
+  }
+  return res;
+};
 
 const main = async () => {
   info('Getting front page...');
@@ -31,7 +54,36 @@ const main = async () => {
   fs.writeFileSync('login-jcaptcah.jpg', cahres.data);
   const code = readlineSync.question('Input the verification code: ').trim().toUpperCase();
   info('Login...');
-  ax.post();
+  await ax.post('j_acegi_formlogin_xsxk.do', querystring.stringify({
+    j_username: username,
+    j_password: password,
+    captchaflag: 'login1',
+    _login_image_: code,
+  }), {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Referer: 'http://zhjwxk.cic.tsinghua.edu.cn/xklogin.do',
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+    },
+  });
+  // info(r);
+  const xwkData = iconv.decode(
+    (await ax.get('xkYjs.vxkYjsXkbBs.do', {
+      params: {
+        m: 'xwkSearch',
+        p_xnxq: '2018-2019-1',
+        tokenPriFlag: 'xwk',
+      },
+      headers: {
+        Referer: 'http://zhjwxk.cic.tsinghua.edu.cn/xklogin.do',
+      },
+      responseType: 'arraybuffer',
+    })).data, 'gb2312',
+  );
+  fs.writeFileSync('xwk.html', xwkData);
+  parseXwk(xwkData);
 };
 
-main();
+// main();
+const xwkData = fs.readFileSync('xwk.html');
+info(parseXwk(xwkData));

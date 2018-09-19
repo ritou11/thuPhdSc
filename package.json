@@ -23,7 +23,9 @@
   "dependencies": {
     "axios": "^0.18.0",
     "axios-cookiejar-support": "^0.4.2",
+    "cheerio": "^1.0.0-rc.2",
     "fs": "^0.0.1-security",
+    "iconv-lite": "^0.4.24",
     "lodash": "^4.17.10",
     "readline-sync": "^1.4.9",
     "tough-cookie": "^2.4.3",
